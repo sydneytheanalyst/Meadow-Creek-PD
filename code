@@ -1,0 +1,109 @@
+import streamlit as st
+from docx import Document
+from io import BytesIO
+
+# Function to generate the Word document
+def generate_report(data):
+    doc = Document()
+
+    # Title Page
+    doc.add_heading('Mixed-Methods Data Analysis Report', level=1)
+    doc.add_paragraph(f"Prepared by: {data['name']}")
+    doc.add_paragraph(f"Role: {data['role']}")
+    doc.add_paragraph(f"Date: {data['date']}")
+    doc.add_page_break()
+
+    # Executive Summary
+    doc.add_heading('Executive Summary', level=2)
+    doc.add_paragraph(data['executive_summary'])
+
+    # Objectives
+    doc.add_heading('Objectives', level=2)
+    for objective in data['objectives']:
+        doc.add_paragraph(f"- {objective}")
+
+    # Methodology
+    doc.add_heading('Methodology', level=2)
+    doc.add_heading('Quantitative Methods', level=3)
+    doc.add_paragraph(data['quantitative_methods'])
+    doc.add_heading('Qualitative Methods', level=3)
+    doc.add_paragraph(data['qualitative_methods'])
+    doc.add_heading('Data Integration', level=3)
+    doc.add_paragraph(data['data_integration'])
+
+    # Data Analysis
+    doc.add_heading('Data Analysis', level=2)
+    doc.add_heading('Quantitative Findings', level=3)
+    doc.add_paragraph(data['quantitative_findings'])
+    doc.add_heading('Qualitative Findings', level=3)
+    doc.add_paragraph(data['qualitative_findings'])
+
+    # Discussion
+    doc.add_heading('Discussion', level=2)
+    doc.add_paragraph(data['discussion'])
+
+    # Recommendations
+    doc.add_heading('Recommendations', level=2)
+    for recommendation in data['recommendations']:
+        doc.add_paragraph(f"- {recommendation}")
+
+    # Conclusion
+    doc.add_heading('Conclusion', level=2)
+    doc.add_paragraph(data['conclusion'])
+
+    # Appendices
+    doc.add_heading('Appendices', level=2)
+    doc.add_paragraph(data['appendices'])
+
+    # Save the document to a BytesIO object
+    buffer = BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+    return buffer
+
+# Streamlit Application
+st.title("Mixed-Methods Data Analysis Report Generator")
+
+# User inputs
+data = {}
+data['name'] = st.text_input("Your Name")
+data['role'] = st.text_input("Your Role")
+data['date'] = st.date_input("Date").strftime('%Y-%m-%d')
+
+st.header("Executive Summary")
+data['executive_summary'] = st.text_area("Provide the Executive Summary")
+
+st.header("Objectives")
+data['objectives'] = st.text_area("List your objectives (one per line)").split("\n")
+
+st.header("Methodology")
+data['quantitative_methods'] = st.text_area("Describe the Quantitative Methods")
+data['qualitative_methods'] = st.text_area("Describe the Qualitative Methods")
+data['data_integration'] = st.text_area("Describe how Data Integration was conducted")
+
+st.header("Data Analysis")
+data['quantitative_findings'] = st.text_area("Summarize Quantitative Findings")
+data['qualitative_findings'] = st.text_area("Summarize Qualitative Findings")
+
+st.header("Discussion")
+data['discussion'] = st.text_area("Write the Discussion section")
+
+st.header("Recommendations")
+data['recommendations'] = st.text_area("List your recommendations (one per line)").split("\n")
+
+st.header("Conclusion")
+data['conclusion'] = st.text_area("Write the Conclusion section")
+
+st.header("Appendices")
+data['appendices'] = st.text_area("Include any Appendices")
+
+# Generate and download the report
+if st.button("Generate Report"):
+    buffer = generate_report(data)
+    st.success("Report generated successfully!")
+    st.download_button(
+        label="Download Report",
+        data=buffer,
+        file_name="Mixed_Methods_Report.docx",
+        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
